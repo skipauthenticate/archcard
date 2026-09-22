@@ -1,0 +1,20 @@
+{
+  "name": "archcard",
+  "version": "0.1.0",
+  "description": "A README-ready architecture map made from repository source files",
+  "type": "module",
+  "bin": {
+    "archcard": "bin/archcard.js"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/skipauthenticate/archcard.git"
+  },
+  "license": "MIT"
+}

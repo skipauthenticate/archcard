@@ -1,0 +1,98 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import test from 'node:test';
+import { analyzeRepo } from '../src/analyze.js';
+import { renderSvg } from '../src/render.js';
+
+function fixture(files, run) {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'archcard-test-'));
+  try {
+    for (const [file, body] of Object.entries(files)) {
+      const target = path.join(root, file);
+      fs.mkdirSync(path.dirname(target), { recursive: true });
+      fs.writeFileSync(target, body);
+    }
+    run(root);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+}
+
+test('groups source folders and counts actual local imports', () => fixture({
+  'src/web/index.ts': "import { load } from '../api/load';\nimport { loadAgain } from '../api/load';\n",
+  'src/api/load.ts': "export { read } from '../data/read';\n",
+  'src/data/read.ts': 'export const read = () => 1;\n',
+  'node_modules/ignored/index.ts': 'export const ignored = true;\n',
+}, (root) => {
+  const graph = analyzeRepo(root);
+  assert.equal(graph.totalFiles, 3);
+  assert.deepEqual(graph.components.map(({ id }) => id), ['src/api', 'src/data', 'src/web']);
+  assert.deepEqual(graph.edges.map(({ from, to, count }) => ({ from, to, count })), [
+    { from: 'src/api', to: 'src/data', count: 1 },
+    { from: 'src/web', to: 'src/api', count: 1 },
+  ]);
+  assert.equal(renderSvg(graph), renderSvg(analyzeRepo(root)));
+  assert.match(renderSvg(graph), /Made with Archcard/);
+  assert.match(renderSvg(graph), /github.com\/skipauthenticate\/archcard/);
+}));
+
+test('renders untrusted names as text and keeps the SVG self-contained', () => {
+  const svg = renderSvg({
+    name: '<script>alert(1)</script>', totalFiles: 1,
+    components: [{ id: 'one', name: '<img>', path: 'src/a&b', files: 1, language: 'JavaScript' }],
+    edges: [],
+  }, { brand: 'A&B', brandUrl: 'https://example.com/?a=1&b=2' });
+  assert.match(svg, /&lt;script&gt;/);
+  assert.match(svg, /src\/a&amp;b/);
+  assert.match(svg, /A&amp;B/);
+  assert.match(svg, /href="https:\/\/example.com\/\?a=1&amp;b=2"/);
+  assert.doesNotMatch(svg, /<script>|<img>/);
+  assert.doesNotMatch(svg, /<image|<foreignObject|@import/);
+  assert.doesNotMatch(renderSvg({ name: 'x', totalFiles: 1, components: [], edges: [] }, { brandUrl: 'javascript:alert(1)' }), /javascript:/);
+});
+
+test('uses a display title without changing the repository name in metadata', () => {
+  const svg = renderSvg({ name: 'story-world', totalFiles: 1, components: [], edges: [] });
+  assert.match(svg, /<title id="title">story-world architecture map<\/title>/);
+  assert.match(svg, />Story World<\/text>/);
+});
+
+test('keeps total counts when small folders are grouped for display', () => {
+  const components = Array.from({ length: 15 }, (_, index) => ({
+    id: `group${index}`, name: `Group ${index}`, path: `group${index}`, files: 1, language: 'Python',
+  }));
+  const svg = renderSvg({ name: 'many', totalFiles: 15, components, edges: [] });
+  assert.match(svg, />15 GROUPS</);
+  assert.match(svg, />More modules</);
+});
+
+test('finds Python relative imports across groups', () => fixture({
+  'src/app/main.py': 'from ..data import store\n',
+  'src/data/store.py': 'value = 1\n',
+}, (root) => {
+  assert.deepEqual(analyzeRepo(root).edges, [{ from: 'src/app', to: 'src/data', count: 1 }]);
+}));
+
+test('ignores imports in common JavaScript comments and strings', () => fixture({
+  'src/web/main.ts': [
+    "// import '../fake/item';",
+    "/* require('../fake/item') */",
+    'const example = "import(\'../fake/item\')";',
+    "import '../real/item';",
+  ].join('\n'),
+  'src/fake/item.ts': 'export const fake = true;\n',
+  'src/real/item.ts': 'export const real = true;\n',
+}, (root) => {
+  assert.deepEqual(analyzeRepo(root).edges, [{ from: 'src/web', to: 'src/real', count: 1 }]);
+}));
+
+test('skips symlinks and rejects empty projects', () => fixture({
+  'src/main.js': "export const main = true;\n",
+}, (root) => {
+  fs.symlinkSync(path.join(root, 'src/main.js'), path.join(root, 'src/copy.js'));
+  assert.equal(analyzeRepo(root).totalFiles, 1);
+  fs.rmSync(path.join(root, 'src/main.js'));
+  assert.throws(() => analyzeRepo(root), /No supported source files/);
+}));
