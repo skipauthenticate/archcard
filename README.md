@@ -10,18 +10,16 @@ This map is from [Storyworld](https://github.com/skipauthenticate/storyworld).
 
 ## Try it
 
-Archcard needs Node.js 20 or later. It also needs Git when you give it a public GitHub URL. There are no runtime packages to install.
+You need Node.js 20 or later, npm, and Git. Run this from the repository you want to map:
 
 ```bash
-git clone https://github.com/skipauthenticate/archcard.git
-cd archcard
-node bin/archcard.js /path/to/your-repo
+npx --yes github:skipauthenticate/archcard .
 ```
 
-Archcard writes `/path/to/your-repo/docs/architecture.svg` and prints the line to add to that repository's README. You can also give it a public GitHub URL:
+Archcard writes `docs/architecture.svg` and prints the line to add to your README. You can also give it a public GitHub URL:
 
 ```bash
-node bin/archcard.js https://github.com/skipauthenticate/docky --out docky.svg
+npx --yes github:skipauthenticate/archcard https://github.com/skipauthenticate/docky --out docky.svg
 ```
 
 Open `docky.svg` to see the result. Commit the SVG and add the printed image link to your README. Archcard does not edit your README or make a commit.

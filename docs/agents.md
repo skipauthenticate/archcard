@@ -5,10 +5,8 @@ The map is a file in your repository. Ask your coding agent to refresh it when a
 Add this short rule to the instruction file your agent reads:
 
 ```text
-When a change alters project folders or imports, run `node /path/to/archcard/bin/archcard.js .` from the repository root. Commit `docs/architecture.svg` with the code change. Do not edit the map by hand.
+When a change alters project folders or imports, run `npx --yes github:skipauthenticate/archcard .` from the repository root. Commit `docs/architecture.svg` with the code change. Do not edit the map by hand.
 ```
-
-Replace `/path/to/archcard` with the path where you cloned Archcard.
 
 | Agent | Instruction file in your repository |
 | --- | --- |
