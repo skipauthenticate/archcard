@@ -45,7 +45,7 @@ test('renders untrusted names as text and keeps the SVG self-contained', () => {
     edges: [],
   }, { brand: 'A&B', brandUrl: 'https://example.com/?a=1&b=2' });
   assert.match(svg, /&lt;script&gt;/);
-  assert.match(svg, /src\/a&amp;b/);
+  assert.match(svg, /&lt;img&gt;/);
   assert.match(svg, /A&amp;B/);
   assert.match(svg, /href="https:\/\/example.com\/\?a=1&amp;b=2"/);
   assert.doesNotMatch(svg, /<script>|<img>/);
@@ -55,7 +55,7 @@ test('renders untrusted names as text and keeps the SVG self-contained', () => {
 
 test('uses a display title without changing the repository name in metadata', () => {
   const svg = renderSvg({ name: 'story-world', totalFiles: 1, components: [], edges: [] });
-  assert.match(svg, /<title id="title">story-world architecture map<\/title>/);
+  assert.match(svg, /<title id="title">story-world repository map<\/title>/);
   assert.match(svg, />Story World<\/text>/);
 });
 
@@ -64,8 +64,8 @@ test('keeps total counts when small folders are grouped for display', () => {
     id: `group${index}`, name: `Group ${index}`, path: `group${index}`, files: 1, language: 'Python',
   }));
   const svg = renderSvg({ name: 'many', totalFiles: 15, components, edges: [] });
-  assert.match(svg, />15 GROUPS</);
-  assert.match(svg, />More modules</);
+  assert.match(svg, />15 groups</);
+  assert.match(svg, /more source areas/);
 });
 
 test('keeps linked code visible before a large test folder', () => {
@@ -75,7 +75,7 @@ test('keeps linked code visible before a large test folder', () => {
   }));
   const svg = renderSvg({ name: 'many', totalFiles: 64, components,
     edges: [{ from: 'group1', to: 'group14', count: 50 }] });
-  assert.match(svg, />Group 14<\/text>/);
+  assert.match(svg, /Group 1  →  Group 14/);
   assert.doesNotMatch(svg, />Group 0<\/text>/);
 });
 

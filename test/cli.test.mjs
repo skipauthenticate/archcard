@@ -17,7 +17,7 @@ test('one command writes an embeddable card into the target repository', () => {
     assert.match(output, /\[!\[Architecture map\]\(docs\/architecture\.svg\)\]/);
     const svg = fs.readFileSync(path.join(root, 'docs', 'architecture.svg'), 'utf8');
     assert.match(svg, /<svg /);
-    assert.match(svg, /<title id="title">MyApp architecture map<\/title>/);
+    assert.match(svg, /<title id="title">MyApp repository map<\/title>/);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }

@@ -1,13 +1,22 @@
-const WIDTH = 1200;
-const LEFT = 54;
-const CARD_WIDTH = 346;
-const CARD_HEIGHT = 142;
-const GAP_X = 27;
-const GAP_Y = 29;
-const TOP = 254;
-const MAX_CARDS = 12;
-const ACCENT = '#8F4B34';
-const compare = (left, right) => left < right ? -1 : left > right ? 1 : 0;
+const WIDTH = 960;
+const MARGIN = 36;
+const LEFT_WIDTH = 548;
+const GAP = 24;
+const RIGHT_X = MARGIN + LEFT_WIDTH + GAP;
+const RIGHT_WIDTH = WIDTH - RIGHT_X - MARGIN;
+const MAX_AREAS = 4;
+const MAX_CHILDREN = 6;
+const MAX_LINKS = 6;
+
+const COLORS = {
+  background: '#F6F5F0',
+  paper: '#FFFDF8',
+  ink: '#202923',
+  muted: '#5C675F',
+  quiet: '#777F76',
+  line: '#D9DDD4',
+  accent: '#8F4B34',
+};
 
 function escapeXml(value) {
   return String(value)
@@ -20,135 +29,211 @@ function short(value, limit) {
   return chars.length <= limit ? String(value) : chars.slice(0, limit - 1).join('') + '…';
 }
 
-function roleFor(component) {
-  const path = component.path.toLowerCase();
-  if (/(^|\/)(app|apps|web|website|www|ui|frontend|client|cli|cmd|components|pages|routes)(\/|$)/.test(path)) return 'INTERFACE';
-  if (/(^|\/)(api|server|backend|services|handlers)(\/|$)/.test(path)) return 'SERVICE';
-  if (/(^|\/)(db|database|data|storage|models)(\/|$)/.test(path)) return 'DATA';
-  if (/(^|\/)(test|tests|spec|specs)(\/|$)/.test(path)) return 'TESTS';
-  if (/(^|\/)(core|lib|shared|utils)(\/|$)/.test(path)) return 'SHARED';
-  return 'MODULE';
+function element(name, attributes, content = '') {
+  const props = Object.entries(attributes).map(([key, value]) => ' ' + key + '="' + escapeXml(value) + '"').join('');
+  return '<' + name + props + '>' + content + '</' + name + '>';
 }
 
-function visibleGraph(graph) {
-  if (graph.components.length <= MAX_CARDS) return graph;
+function label(path) {
+  const name = path.split('/').at(-1).replace(/[-_]/g, ' ');
+  if (name === 'src') return 'Source';
+  if (name === 'api' || name === 'ui' || name === 'cli' || name === 'mcp') return name.toUpperCase();
+  return name.replace(/\b\w/g, (letter) => letter.toUpperCase()).replace(/\b(Mcp|Llm|Ai)\b/g, (word) => word.toUpperCase());
+}
+
+function isSupport(component) {
+  if (component.path === '.') return true;
+  return component.language === 'Shell' || component.path.split('/').some((part) => /^(test|tests|__tests__|spec|specs|scripts|examples|benchmarks)$/.test(part));
+}
+
+function supportLabel(component) {
+  if (component.path === '.') return 'Root files';
+  const parts = component.path.split('/');
+  if (parts.some((part) => /^(test|tests|__tests__|spec|specs)$/.test(part))) return 'Tests';
+  if (parts.includes('scripts') || component.language === 'Shell') return 'Scripts';
+  if (parts.includes('examples')) return 'Examples';
+  if (parts.includes('benchmarks')) return 'Benchmarks';
+  return label(component.path);
+}
+
+function areaKey(component) {
+  const parts = component.path.split('/');
+  if (['apps', 'packages', 'services'].includes(parts[0])) return parts[0];
+  if (parts.length > 1 && ['server', 'backend', 'api', 'client', 'frontend', 'vector-store'].includes(parts[1])) return parts.slice(0, 2).join('/');
+  return parts[0];
+}
+
+function sourceAreas(graph) {
+  let main = graph.components.filter((component) => !isSupport(component));
+  let support = graph.components.filter(isSupport);
+  if (main.length === 0) {
+    main = support;
+    support = [];
+  }
+
   const incoming = new Map();
   for (const edge of graph.edges) incoming.set(edge.to, (incoming.get(edge.to) ?? 0) + edge.count);
-  const score = (component) => component.files + 2 * Math.sqrt(incoming.get(component.id) ?? 0) + (roleFor(component) === 'SERVICE' ? 2 : 0);
-  const ranked = [...graph.components].sort((a, b) =>
-    Number(roleFor(a) === 'TESTS') - Number(roleFor(b) === 'TESTS') || score(b) - score(a) || compare(a.id, b.id));
-  const selected = new Set(ranked.slice(0, MAX_CARDS - 1).map((component) => component.id));
-  const keep = graph.components.filter((component) => selected.has(component.id));
-  const rest = graph.components.filter((component) => !selected.has(component.id));
-  const kept = new Set(keep.map((component) => component.id));
-  let otherId = '__archcard_other__';
-  while (graph.components.some((component) => component.id === otherId)) otherId += '_';
-  const edges = new Map();
-  for (const edge of graph.edges) {
-    const from = kept.has(edge.from) ? edge.from : otherId;
-    const to = kept.has(edge.to) ? edge.to : otherId;
-    if (from === to) continue;
-    const key = `${from}\0${to}`;
-    edges.set(key, (edges.get(key) ?? 0) + edge.count);
+  const importance = (component) => component.files + 2 * Math.sqrt(incoming.get(component.id) ?? 0);
+  const areas = new Map();
+  for (const component of main) {
+    const key = areaKey(component);
+    if (!areas.has(key)) areas.set(key, { key, components: [], files: 0 });
+    const area = areas.get(key);
+    area.components.push(component);
+    area.files += component.files;
   }
   return {
-    ...graph,
-    components: [...keep, { id: otherId, name: 'More modules', path: `${rest.length} groups`, files: rest.reduce((sum, component) => sum + component.files, 0), language: 'Mixed' }],
-    edges: [...edges].map(([key, count]) => {
-      const [from, to] = key.split('\0');
-      return { from, to, count };
-    }).sort((a, b) => b.count - a.count || compare(a.from, b.from) || compare(a.to, b.to)),
+    areas: [...areas.values()].sort((a, b) => b.files - a.files || a.key.localeCompare(b.key))
+      .map((area) => ({
+        ...area,
+        components: area.components.sort((a, b) => importance(b) - importance(a) || a.id.localeCompare(b.id)),
+      })),
+    support: support.sort((a, b) => b.files - a.files || a.id.localeCompare(b.id)),
   };
 }
 
-function connection(from, to, color, width, lane) {
-  let startX;
-  let startY;
-  let endX;
-  let endY;
-  if (Math.abs(from.y - to.y) < 1) {
-    const forward = from.x < to.x;
-    startX = from.x + (forward ? CARD_WIDTH : 0);
-    endX = to.x + (forward ? 0 : CARD_WIDTH);
-    startY = from.y + CARD_HEIGHT / 2;
-    endY = to.y + CARD_HEIGHT / 2;
-  } else {
-    const forward = from.y < to.y;
-    startX = from.x + CARD_WIDTH / 2 + lane;
-    endX = to.x + CARD_WIDTH / 2 + lane;
-    startY = from.y + (forward ? CARD_HEIGHT : 0);
-    endY = to.y + (forward ? 0 : CARD_HEIGHT);
-  }
-  const midX = (startX + endX) / 2;
-  const midY = (startY + endY) / 2;
-  const curve = Math.abs(startY - endY) < 1
-    ? `C ${midX} ${startY - 42}, ${midX} ${endY - 42}, ${endX} ${endY}`
-    : `C ${startX} ${midY}, ${endX} ${midY}, ${endX} ${endY}`;
-  return `<path d="M ${startX} ${startY} ${curve}" fill="none" stroke="${color}" stroke-width="${width}" stroke-opacity=".60" marker-end="url(#arrow)"/>`;
+function text(x, y, value, attributes = {}) {
+  return element('text', { x, y, fill: COLORS.ink, 'font-family': 'Inter, ui-sans-serif, system-ui, sans-serif', ...attributes }, escapeXml(value));
 }
 
-export function renderSvg(input, options = {}) {
-  const graph = visibleGraph(input);
+function line(x1, y1, x2, y2) {
+  return element('line', { x1, y1, x2, y2, stroke: COLORS.line });
+}
+
+function areaCard(area, y) {
+  const shown = area.components.slice(0, MAX_CHILDREN);
+  const extra = area.components.length - shown.length;
+  const hasChildren = area.components.length > 1 || area.components[0].id !== area.key;
+  const rows = hasChildren ? Math.ceil(shown.length / 2) : 0;
+  const height = 83 + rows * 44 + (extra ? 22 : 0);
+  const content = [
+    element('rect', { x: MARGIN, y, width: LEFT_WIDTH, height, rx: 12, fill: COLORS.paper, stroke: COLORS.line }),
+    element('rect', { x: MARGIN, y: y + 17, width: 3, height: 38, rx: 1.5, fill: COLORS.accent }),
+    text(MARGIN + 20, y + 31, label(area.key), { 'font-size': 20, 'font-weight': 650 }),
+    text(MARGIN + LEFT_WIDTH - 18, y + 29, area.files + (area.files === 1 ? ' file' : ' files'), {
+      'font-size': 13, fill: COLORS.muted, 'text-anchor': 'end',
+    }),
+    text(MARGIN + 20, y + 53, area.key === 'root' ? '.' : area.key, {
+      'font-size': 13, fill: COLORS.muted, 'font-family': 'ui-monospace, SFMono-Regular, Menlo, monospace',
+    }),
+  ];
+  if (hasChildren) {
+    content.push(line(MARGIN + 20, y + 66, MARGIN + LEFT_WIDTH - 20, y + 66));
+    shown.forEach((component, index) => {
+      const column = index % 2;
+      const row = Math.floor(index / 2);
+      const x = MARGIN + 20 + column * 257;
+      const rowY = y + 94 + row * 44;
+      const name = component.id === area.key ? 'Root files' : component.name;
+      content.push(text(x, rowY, short(name, 20), { 'font-size': 16, 'font-weight': 600 }));
+      content.push(text(x + 225, rowY, String(component.files), { 'font-size': 14, fill: COLORS.muted, 'text-anchor': 'end' }));
+    });
+    if (extra) content.push(text(MARGIN + 20, y + height - 14, '+' + extra + ' more folders in this area', { 'font-size': 13, fill: COLORS.muted }));
+  } else {
+    content.push(text(MARGIN + 20, y + 72, area.components[0].language, { 'font-size': 13, fill: COLORS.quiet }));
+  }
+  return { svg: content.join('\n'), height };
+}
+
+function dependencyPanel(graph, y, minimumHeight) {
+  const byId = new Map(graph.components.map((component) => [component.id, component]));
+  const mainEdges = graph.edges.filter((edge) => !isSupport(byId.get(edge.from)) && !isSupport(byId.get(edge.to)));
+  const supportEdges = graph.edges.filter((edge) => isSupport(byId.get(edge.from)) || isSupport(byId.get(edge.to)));
+  const edges = [...mainEdges, ...supportEdges].slice(0, MAX_LINKS);
+  const height = Math.max(minimumHeight, 104 + Math.max(edges.length, 1) * 70);
+  const x = RIGHT_X;
+  const content = [
+    element('rect', { x, y, width: RIGHT_WIDTH, height, rx: 12, fill: COLORS.paper, stroke: COLORS.line }),
+    text(x + 20, y + 34, 'Detected imports', { 'font-size': 19, 'font-weight': 650 }),
+    text(x + 20, y + 56, 'A → B means A imports B.', { 'font-size': 13, fill: COLORS.muted }),
+    line(x + 20, y + 71, x + RIGHT_WIDTH - 20, y + 71),
+  ];
+  if (edges.length === 0) {
+    content.push(text(x + 20, y + 110, 'No folder links found.', { 'font-size': 16, fill: COLORS.muted }));
+  }
+  edges.forEach((edge, index) => {
+    const from = byId.get(edge.from);
+    const to = byId.get(edge.to);
+    const rowY = y + 106 + index * 70;
+    content.push(element('g', {}, [
+      element('title', {}, escapeXml(from.path + ' imports ' + to.path)),
+      text(x + 20, rowY, short(from.name === 'Source root' ? 'Source' : from.name, 14) + '  →  ' + short(to.name === 'Source root' ? 'Source' : to.name, 14), { 'font-size': 16, 'font-weight': 600 }),
+      text(x + 20, rowY + 22, edge.count + (edge.count === 1 ? ' source file' : ' source files'), { 'font-size': 13, fill: COLORS.muted }),
+    ].join('')));
+    if (index < edges.length - 1) content.push(line(x + 20, rowY + 33, x + RIGHT_WIDTH - 20, rowY + 33));
+  });
+  content.push(text(x + 20, y + height - 20, 'Showing ' + edges.length + ' of ' + graph.edges.length + ' folder ' + (graph.edges.length === 1 ? 'link' : 'links'), {
+    'font-size': 12, fill: COLORS.quiet,
+  }));
+  return content.join('\n');
+}
+
+export function renderSvg(graph, options = {}) {
   const brand = options.brand ?? 'Archcard';
   const brandUrl = options.brandUrl === undefined
     ? 'https://github.com/skipauthenticate/archcard'
     : /^https?:\/\//.test(options.brandUrl) ? options.brandUrl : '';
-  const rows = Math.ceil(graph.components.length / 3);
-  const height = TOP + rows * (CARD_HEIGHT + GAP_Y) + 116;
-  const positions = new Map(graph.components.map((component, index) => {
-    const row = Math.floor(index / 3);
-    const rowSize = Math.min(3, graph.components.length - row * 3);
-    return [component.id, {
-      x: LEFT + (3 - rowSize) * (CARD_WIDTH + GAP_X) / 2 + (index % 3) * (CARD_WIDTH + GAP_X),
-      y: TOP + row * (CARD_HEIGHT + GAP_Y),
-    }];
-  }));
-  const visibleEdges = graph.edges.filter((edge) => positions.has(edge.from) && positions.has(edge.to)).slice(0, 4);
-  const connectionPaths = visibleEdges.map((edge, index) => connection(
-    positions.get(edge.from), positions.get(edge.to), '#68766C', Math.min(1.5 + Math.log2(edge.count + 1) * 0.3, 3), (index - 1.5) * 14,
-  )).join('\n');
-  const cards = graph.components.map((component, index) => {
-    const { x, y } = positions.get(component.id);
-    const name = escapeXml(short(component.name, 23));
-    const filePath = escapeXml(short(component.path, 40));
-    const language = escapeXml(short(component.language, 14));
-    const role = roleFor(component);
-    return `<g transform="translate(${x} ${y})">
-      <rect width="${CARD_WIDTH}" height="${CARD_HEIGHT}" rx="13" fill="#FFFEFA" stroke="${index === 0 ? ACCENT : '#C8C9C0'}" stroke-width="1"/>
-      <rect x="0" y="22" width="3" height="45" rx="1.5" fill="${ACCENT}"/>
-      <text x="22" y="37" fill="${ACCENT}" font-size="11" font-weight="700" letter-spacing="1.6">${String(index + 1).padStart(2, '0')} / ${role}${index === 0 ? ' · LARGEST GROUP' : ''}</text>
-      <text x="22" y="77" fill="#202922" font-size="25" font-weight="650">${name}</text>
-      <text x="22" y="103" fill="#59645B" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">${filePath}</text>
-      <line x1="22" y1="115" x2="${CARD_WIDTH - 22}" y2="115" stroke="#D9DCD3"/>
-      <text x="22" y="133" fill="#5E6860" font-size="11">${component.files} ${component.files === 1 ? 'source file' : 'source files'}</text>
-      <text x="${CARD_WIDTH - 22}" y="133" fill="#5E6860" font-size="11" text-anchor="end">${language}</text>
-    </g>`;
-  }).join('\n');
-  const title = escapeXml(short(graph.name.replace(/[-_]/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase()), 28));
-  const attribution = brandUrl
-    ? `<a href="${escapeXml(brandUrl)}" target="_blank"><text x="${WIDTH - LEFT}" y="${height - 40}" text-anchor="end" fill="#58645C" font-size="13">Made with ${escapeXml(brand)} ↗</text></a>`
-    : `<text x="${WIDTH - LEFT}" y="${height - 40}" text-anchor="end" fill="#58645C" font-size="13">Made with ${escapeXml(brand)}</text>`;
+  const sections = sourceAreas(graph);
+  const areas = sections.areas.slice(0, MAX_AREAS);
+  const extraAreas = sections.areas.length - areas.length;
+  const bodyY = 210;
+  let cursor = bodyY;
+  const left = [];
+  for (const area of areas) {
+    const card = areaCard(area, cursor);
+    left.push(card.svg);
+    cursor += card.height + 14;
+  }
+  if (extraAreas) {
+    left.push(text(MARGIN + 8, cursor + 4, '+' + extraAreas + ' more source areas', { 'font-size': 14, fill: COLORS.muted }));
+    cursor += 24;
+  }
+  if (sections.support.length) {
+    const totals = new Map();
+    for (const component of sections.support) {
+      const name = supportLabel(component);
+      totals.set(name, (totals.get(name) ?? 0) + component.files);
+    }
+    const labels = [...totals].sort((a, b) => b[1] - a[1]).map(([name, files]) => name + ' ' + files);
+    left.push(text(MARGIN + 4, cursor + 10, 'SUPPORTING CODE', { 'font-size': 11, 'font-weight': 700, fill: COLORS.accent, 'letter-spacing': 1.7 }));
+    left.push(text(MARGIN + 4, cursor + 34, short(labels.join('  ·  '), 76), { 'font-size': 14, fill: COLORS.muted }));
+    cursor += 52;
+  }
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${WIDTH} ${height}" width="${WIDTH}" height="${height}" role="img" aria-labelledby="title description">
-  <title id="title">${escapeXml(graph.name)} architecture map</title>
-  <desc id="description">${input.components.length} component groups and ${input.edges.length} import links found in ${graph.totalFiles} source files.</desc>
-  <defs>
-    <pattern id="dots" width="28" height="28" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#7C877C" opacity=".17"/></pattern>
-    <marker id="arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7" fill="none" stroke="#68766C" stroke-width="1"/></marker>
-  </defs>
-  <rect width="${WIDTH}" height="${height}" rx="18" fill="#F2F1EB"/>
-  <rect width="${WIDTH}" height="${height}" rx="18" fill="url(#dots)"/>
-  <text x="${LEFT}" y="57" fill="${ACCENT}" font-size="11" font-weight="700" letter-spacing="3">REPOSITORY / ARCHITECTURE</text>
-  <text x="${LEFT}" y="127" fill="#202922" font-size="57" font-weight="700">${title}</text>
-  <text x="${LEFT}" y="161" fill="#5E6860" font-size="15">A map of the source, drawn from local imports.</text>
-  <line x1="${LEFT}" y1="197" x2="${WIDTH - LEFT}" y2="197" stroke="#C7CCC2"/>
-  <text x="${LEFT}" y="225" fill="#38473C" font-size="12" font-weight="600">${input.components.length} GROUPS</text>
-  <text x="${LEFT + 181}" y="225" fill="#38473C" font-size="12" font-weight="600">${input.edges.length} IMPORT LINKS</text>
-  <text x="${LEFT + 360}" y="225" fill="#38473C" font-size="12" font-weight="600">${graph.totalFiles} SOURCE FILES</text>
-  <g>${connectionPaths}</g>
-  ${cards}
-  <line x1="${LEFT}" y1="${height - 69}" x2="${WIDTH - LEFT}" y2="${height - 69}" stroke="#C7CCC2"/>
-  <text x="${LEFT}" y="${height - 40}" fill="#657067" font-size="12">${visibleEdges.length} of ${input.edges.length} local links shown · Groups follow source folders</text>
-  ${attribution}
-</svg>\n`;
+  const leftHeight = cursor - bodyY;
+  const rightHeight = 104 + Math.max(1, Math.min(MAX_LINKS, graph.edges.length)) * 70;
+  const bodyHeight = Math.max(leftHeight, rightHeight);
+  const height = bodyY + bodyHeight + 93;
+  const displayTitle = short(graph.name.replace(/[-_]/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase()), 25);
+  const credit = text(WIDTH - MARGIN, height - 30, 'Made with ' + brand + ' ↗', {
+    'font-size': 12, fill: COLORS.muted, 'text-anchor': 'end',
+  });
+  const attribution = brandUrl ? element('a', { href: brandUrl, target: '_blank' }, credit) : credit;
+
+  return element('svg', {
+    xmlns: 'http://www.w3.org/2000/svg',
+    viewBox: '0 0 ' + WIDTH + ' ' + height,
+    width: WIDTH,
+    height,
+    role: 'img',
+    'aria-labelledby': 'title description',
+  }, [
+    element('title', { id: 'title' }, escapeXml(graph.name + ' repository map')),
+    element('desc', { id: 'description' }, escapeXml(graph.components.length + (graph.components.length === 1 ? ' source group, ' : ' source groups, ') + graph.edges.length + (graph.edges.length === 1 ? ' folder link, and ' : ' folder links, and ') + graph.totalFiles + (graph.totalFiles === 1 ? ' source file.' : ' source files.'))),
+    element('rect', { width: WIDTH, height, rx: 16, fill: COLORS.background }),
+    text(MARGIN, 42, 'REPOSITORY MAP', { 'font-size': 11, 'font-weight': 700, fill: COLORS.accent, 'letter-spacing': 2.8 }),
+    text(MARGIN, 91, displayTitle, { 'font-size': 43, 'font-weight': 700 }),
+    text(MARGIN, 122, 'Source folders and detected imports.', { 'font-size': 16, fill: COLORS.muted }),
+    line(MARGIN, 151, WIDTH - MARGIN, 151),
+    text(MARGIN, 178, graph.totalFiles + (graph.totalFiles === 1 ? ' source file' : ' source files'), { 'font-size': 14, 'font-weight': 600 }),
+    text(MARGIN + 170, 178, graph.components.length + (graph.components.length === 1 ? ' group' : ' groups'), { 'font-size': 14, 'font-weight': 600 }),
+    text(MARGIN + 290, 178, graph.edges.length + (graph.edges.length === 1 ? ' folder link' : ' folder links'), { 'font-size': 14, 'font-weight': 600 }),
+    ...left,
+    dependencyPanel(graph, bodyY, bodyHeight - 14),
+    line(MARGIN, height - 64, WIDTH - MARGIN, height - 64),
+    text(MARGIN, height - 32, 'Counts use supported source files. Runtime calls are outside this map.', {
+      'font-size': 12, fill: COLORS.quiet,
+    }),
+    attribution,
+  ].join('\n')) + '\n';
 }

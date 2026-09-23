@@ -28,9 +28,9 @@ Use `--title LMStash` when you want to keep the exact capitalization of a projec
 
 ## What the map shows
 
-- Source folders become labeled cards. Each card shows its path, main language, and file count.
-- Lines show imports that Archcard found between folders. A thicker line means more imports.
-- Large repositories keep their main folders visible and group the rest into one card.
+- Source folders are grouped into project areas. Each area shows key folders and file counts.
+- A separate list shows which folders import from others and how many source files do so.
+- Large repositories show the main areas and state how many folders and links are left out.
 
 The map reflects the files at the time you generate it. It does not guess at runtime traffic, cloud services, or hidden dependencies.
 
@@ -49,6 +49,8 @@ Copy this line after you commit `docs/architecture.svg`:
 The image links back to Archcard. The SVG also has a small credit in its footer.
 
 ## How it works
+
+[![Archcard source map with detected imports](docs/archcard.svg)](https://github.com/skipauthenticate/archcard)
 
 The analyzer scans common source file types and groups them by directory. It follows recognized local imports in JavaScript, TypeScript, Python, and Rust. It skips dependencies and build output. The renderer writes a self-contained SVG, so the image works in a GitHub README without a separate server.
 
