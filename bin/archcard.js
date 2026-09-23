@@ -8,7 +8,7 @@ import { analyzeRepo } from '../src/analyze.js';
 import { renderSvg } from '../src/render.js';
 import { renderReport } from '../src/report.js';
 
-const help = `Archcard — turn a repository into a README-ready architecture map
+const help = `Archcard — turn a repository into a README-ready repository map
 
 Usage:
   archcard [path-or-github-url] [--out docs/architecture.svg] [--title "Project Name"]
@@ -95,7 +95,7 @@ function main(args) {
     process.stdout.write(`Wrote ${shown} and ${shownReport} from ${graph.totalFiles} source files.\n\n`);
     if (imagePath !== '..' && !imagePath.startsWith('../')) {
       const reportPath = path.relative(shareRoot, report).split(path.sep).join('/');
-      process.stdout.write(`Add this to your README:\n[![Architecture map](${encodeURI(imagePath)})](${encodeURI(reportPath)})\n[Made with Archcard](https://github.com/skipauthenticate/archcard)\n`);
+      process.stdout.write(`Add this to your README:\n[![Repository map](${encodeURI(imagePath)})](${encodeURI(reportPath)})\n[Made with Archcard](https://github.com/skipauthenticate/archcard)\n`);
     }
   } finally {
     if (temporary) fs.rmSync(temporary, { recursive: true, force: true });

@@ -1,14 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 1024" width="960" height="1024" role="img" aria-labelledby="title description"><title id="title">Archcard repository map</title>
-<desc id="description">6 source files, 3 source groups, and 5 local file imports.</desc>
-<rect width="960" height="1024" rx="16" fill="#F6F5F0"></rect>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 904" width="960" height="904" role="img" aria-labelledby="title description"><title id="title">Archcard repository map</title>
+<desc id="description">6 source files in 3 groups.</desc>
+<rect width="960" height="904" rx="16" fill="#F6F5F0"></rect>
 <text x="36" y="37" fill="#8F4B34" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="11" font-weight="700" letter-spacing="2.5">REPOSITORY MAP</text>
 <text x="36" y="83" fill="#202923" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="40" font-weight="700">Archcard</text>
-<text x="36" y="113" fill="#5C675F" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16">Source areas, folders, and direct file imports.</text>
+<text x="36" y="113" fill="#5C675F" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16">Source areas, folders, and files.</text>
 <line x1="36" y1="133" x2="924" y2="133" stroke="#D9DDD4"></line>
 <text x="36" y="158" fill="#202923" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="600">6 source files</text>
 <text x="206" y="158" fill="#202923" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="600">3 groups</text>
-<text x="326" y="158" fill="#202923" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="600">5 local file imports</text>
-<rect x="36" y="178" width="888" height="189" rx="14" fill="#FFFDF8" stroke="#D9DDD4"></rect>
+<text x="326" y="158" fill="#202923" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="600">1 language</text>
+<rect x="36" y="178" width="888" height="265" rx="14" fill="#FFFDF8" stroke="#D9DDD4"></rect>
 <rect x="36" y="196" width="3" height="41" rx="1.5" fill="#8F4B34"></rect>
 <text x="56" y="212" fill="#202923" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="22" font-weight="680">Bin</text>
 <text x="904" y="210" fill="#5C675F" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14" text-anchor="end">1 file</text>
@@ -18,39 +18,32 @@
 <rect x="56" y="289" width="270" height="32" rx="7" fill="#F2F1EA"></rect>
 <text x="67" y="310" fill="#202923" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="560">Root files</text>
 <text x="314" y="310" fill="#5C675F" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="13" text-anchor="end">1</text>
-<rect x="36" y="383" width="888" height="189" rx="14" fill="#FFFDF8" stroke="#D9DDD4"></rect>
-<rect x="36" y="401" width="3" height="41" rx="1.5" fill="#8F4B34"></rect>
-<text x="56" y="417" fill="#202923" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="22" font-weight="680">Source</text>
-<text x="904" y="415" fill="#5C675F" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14" text-anchor="end">3 files</text>
-<text x="56" y="441" fill="#5C675F" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14">src</text>
-<line x1="56" y1="458" x2="904" y2="458" stroke="#D9DDD4"></line>
-<text x="56" y="481" fill="#8F4B34" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="11" font-weight="700" letter-spacing="1.4">SOURCE GROUPS</text>
-<rect x="56" y="494" width="270" height="32" rx="7" fill="#F2F1EA"></rect>
-<text x="67" y="515" fill="#202923" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="560">Root files</text>
-<text x="314" y="515" fill="#5C675F" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="13" text-anchor="end">3</text>
-<rect x="36" y="588" width="888" height="301" rx="12" fill="#FFFDF8" stroke="#D9DDD4"></rect>
-<text x="56" y="618" fill="#202923" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="650">Across areas</text>
-<text x="56" y="639" fill="#5C675F" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="13">Direct source imports between different areas</text>
-<text x="56" y="665" fill="#202923" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14">bin  →  src</text>
-<text x="904" y="665" fill="#5C675F" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="13" text-anchor="end">1</text>
-<text x="56" y="693" fill="#202923" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14">test  →  src</text>
-<text x="904" y="693" fill="#5C675F" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="13" text-anchor="end">1</text>
-<line x1="56" y1="704" x2="904" y2="704" stroke="#D9DDD4"></line>
-<text x="56" y="726" fill="#8F4B34" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="11" font-weight="700" letter-spacing="1.4">FILE IMPORTS</text>
-<rect x="56" y="736" width="848" height="39" rx="7" fill="#F2F1EA"></rect>
-<text x="68" y="761" fill="#202923" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="600">bin/archcard.js</text>
-<text x="370" y="761" fill="#8F4B34" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="18">→</text>
-<text x="406" y="761" fill="#202923" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14">src/analyze.js</text>
-<rect x="56" y="782" width="848" height="39" rx="7" fill="#F2F1EA"></rect>
-<text x="68" y="807" fill="#202923" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="600">bin/archcard.js</text>
-<text x="370" y="807" fill="#8F4B34" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="18">→</text>
-<text x="406" y="807" fill="#202923" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14">src/render.js</text>
-<rect x="56" y="828" width="848" height="39" rx="7" fill="#F2F1EA"></rect>
-<text x="68" y="853" fill="#202923" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="600">bin/archcard.js</text>
-<text x="370" y="853" fill="#8F4B34" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="18">→</text>
-<text x="406" y="853" fill="#202923" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14">src/report.js</text>
-<text x="40" y="914" fill="#8F4B34" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="11" font-weight="700" letter-spacing="1.4">SUPPORTING CODE</text>
-<text x="40" y="939" fill="#5C675F" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14">Tests 2</text>
-<line x1="36" y1="966" x2="924" y2="966" stroke="#D9DDD4"></line>
-<text x="36" y="997" fill="#777F76" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="12">A → B means A imports B. Runtime traffic is outside this map.</text>
-<a href="https://github.com/skipauthenticate/archcard" target="_blank"><text x="924" y="997" fill="#5C675F" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="12" text-anchor="end">Made with Archcard ↗</text></a></svg>
+<line x1="56" y1="338" x2="904" y2="338" stroke="#D9DDD4"></line>
+<text x="56" y="363" fill="#8F4B34" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="11" font-weight="700" letter-spacing="1.4">FILES TO OPEN</text>
+<text x="904" y="363" fill="#5C675F" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="12" text-anchor="end">Showing 1 of 1 files</text>
+<rect x="56" y="376" width="412" height="37" rx="7" fill="#F2F1EA"></rect>
+<g><title>bin/archcard.js</title><text x="67" y="400" fill="#202923" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="570">archcard.js</text><text x="457" y="400" fill="#5C675F" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="11" text-anchor="end">JavaScript</text></g>
+<rect x="36" y="459" width="888" height="310" rx="14" fill="#FFFDF8" stroke="#D9DDD4"></rect>
+<rect x="36" y="477" width="3" height="41" rx="1.5" fill="#8F4B34"></rect>
+<text x="56" y="493" fill="#202923" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="22" font-weight="680">Source</text>
+<text x="904" y="491" fill="#5C675F" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14" text-anchor="end">3 files</text>
+<text x="56" y="517" fill="#5C675F" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14">src</text>
+<line x1="56" y1="534" x2="904" y2="534" stroke="#D9DDD4"></line>
+<text x="56" y="557" fill="#8F4B34" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="11" font-weight="700" letter-spacing="1.4">SOURCE GROUPS</text>
+<rect x="56" y="570" width="270" height="32" rx="7" fill="#F2F1EA"></rect>
+<text x="67" y="591" fill="#202923" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="560">Root files</text>
+<text x="314" y="591" fill="#5C675F" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="13" text-anchor="end">3</text>
+<line x1="56" y1="619" x2="904" y2="619" stroke="#D9DDD4"></line>
+<text x="56" y="644" fill="#8F4B34" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="11" font-weight="700" letter-spacing="1.4">FILES TO OPEN</text>
+<text x="904" y="644" fill="#5C675F" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="12" text-anchor="end">Showing 3 of 3 files</text>
+<rect x="56" y="657" width="412" height="37" rx="7" fill="#F2F1EA"></rect>
+<g><title>src/analyze.js</title><text x="67" y="681" fill="#202923" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="570">analyze.js</text><text x="457" y="681" fill="#5C675F" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="11" text-anchor="end">JavaScript</text></g>
+<rect x="484" y="657" width="412" height="37" rx="7" fill="#F2F1EA"></rect>
+<g><title>src/render.js</title><text x="495" y="681" fill="#202923" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="570">render.js</text><text x="885" y="681" fill="#5C675F" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="11" text-anchor="end">JavaScript</text></g>
+<rect x="56" y="702" width="412" height="37" rx="7" fill="#F2F1EA"></rect>
+<g><title>src/report.js</title><text x="67" y="726" fill="#202923" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="570">report.js</text><text x="457" y="726" fill="#5C675F" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="11" text-anchor="end">JavaScript</text></g>
+<text x="40" y="794" fill="#8F4B34" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="11" font-weight="700" letter-spacing="1.4">SUPPORTING CODE</text>
+<text x="40" y="819" fill="#5C675F" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14">Tests 2</text>
+<line x1="36" y1="846" x2="924" y2="846" stroke="#D9DDD4"></line>
+<text x="36" y="877" fill="#777F76" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="12">Open the full map for every scanned source file.</text>
+<a href="https://github.com/skipauthenticate/archcard" target="_blank"><text x="924" y="877" fill="#5C675F" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="12" text-anchor="end">Made with Archcard ↗</text></a></svg>

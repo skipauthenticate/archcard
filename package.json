@@ -1,7 +1,7 @@
 {
   "name": "archcard",
   "version": "0.1.0",
-  "description": "A README-ready architecture map made from repository source files",
+  "description": "A README-ready repository map made from source files",
   "type": "module",
   "bin": {
     "archcard": "bin/archcard.js"
