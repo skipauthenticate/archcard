@@ -44,7 +44,10 @@ function collect(root) {
 function groupFor(file) {
   const parts = file.split('/');
   if (parts.length === 1) return 'root';
-  if (['apps', 'packages', 'services'].includes(parts[0]) && parts.length > 2) return `${parts[0]}/${parts[1]}`;
+  if (['apps', 'packages', 'services'].includes(parts[0]) && parts.length > 2) {
+    if (parts[2] === 'src' && parts.length > 4) return `${parts[0]}/${parts[1]}/${parts[3]}`;
+    return `${parts[0]}/${parts[1]}`;
+  }
   const source = parts.findIndex((part, index) => index < 3 && part === 'src');
   if (source !== -1) {
     if (['components', 'features', 'modules'].includes(parts[source + 1]) && parts.length > source + 3) return parts.slice(0, source + 3).join('/');
@@ -53,7 +56,7 @@ function groupFor(file) {
   }
   const codeRoot = parts.slice(0, 2).findLastIndex((part) => ['server', 'backend', 'api', 'client', 'frontend', 'vector-store'].includes(part));
   if (codeRoot !== -1) return parts.slice(0, Math.min(parts.length - 1, codeRoot + 2)).join('/');
-  return parts[0];
+  return parts.length > 2 ? parts.slice(0, 2).join('/') : parts[0];
 }
 
 function resolveCandidate(base, files) {
@@ -155,14 +158,20 @@ function labelFor(group) {
 
 function localPackages(root, groups) {
   const packages = new Map();
-  for (const group of groups) {
+  const groupSet = new Set(groups);
+  const seen = new Set();
+  for (const group of groupSet) {
     if (group === 'root') continue;
-    const manifest = path.join(root, group, 'package.json');
+    const parts = group.split('/');
+    const packageRoot = ['apps', 'packages', 'services'].includes(parts[0]) ? parts.slice(0, 2).join('/') : group;
+    if (seen.has(packageRoot)) continue;
+    seen.add(packageRoot);
+    const manifest = path.join(root, packageRoot, 'package.json');
     try {
       const stat = fs.lstatSync(manifest);
       if (!stat.isFile() || stat.size > 65_536) continue;
       const name = JSON.parse(fs.readFileSync(manifest, 'utf8')).name;
-      if (typeof name === 'string') packages.set(name, group);
+      if (typeof name === 'string') packages.set(name, groupSet.has(packageRoot) ? packageRoot : group);
     } catch { /* A source folder does not need a package manifest. */ }
   }
   return packages;

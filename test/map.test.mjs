@@ -99,6 +99,22 @@ test('maps nested source roots and TypeScript files imported with .js names', ()
   ]);
 }));
 
+test('shows Python package folders and workspace package modules', () => fixture({
+  'atlas_voice/cli.py': 'from atlas_voice.providers import asr\n',
+  'atlas_voice/providers/asr.py': 'ready = True\n',
+  'packages/core/package.json': '{"name":"@demo/core"}',
+  'packages/core/src/index.ts': "export { scan } from './analyzer/scan';\n",
+  'packages/core/src/analyzer/scan.ts': 'export const scan = () => 1;\n',
+  'packages/cli/src/index.ts': "import { scan } from '@demo/core';\n",
+}, (root) => {
+  const graph = analyzeRepo(root);
+  assert.deepEqual(graph.edges, [
+    { from: 'atlas_voice', to: 'atlas_voice/providers', count: 1 },
+    { from: 'packages/cli', to: 'packages/core', count: 1 },
+    { from: 'packages/core', to: 'packages/core/analyzer', count: 1 },
+  ]);
+}));
+
 test('ignores imports in common JavaScript comments and strings', () => fixture({
   'src/web/main.ts': [
     "// import '../fake/item';",
