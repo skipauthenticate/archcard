@@ -21,3 +21,4 @@ jobs:
       - run: npm test
       - run: node bin/archcard.js . --out /tmp/archcard.svg
       - run: test -s /tmp/archcard.svg
+      - run: test -s /tmp/archcard-map.md

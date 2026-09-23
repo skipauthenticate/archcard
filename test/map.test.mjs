@@ -38,6 +38,15 @@ test('groups source folders and counts actual local imports', () => fixture({
   assert.match(renderSvg(graph), /github.com\/skipauthenticate\/archcard/);
 }));
 
+test('shows direct file imports between source areas', () => fixture({
+  'bin/cli.js': "import '../src/analyze.js';\n",
+  'src/analyze.js': 'export const ready = true;\n',
+}, (root) => {
+  const svg = renderSvg(analyzeRepo(root));
+  assert.match(svg, /bin\/cli\.js/);
+  assert.match(svg, /src\/analyze\.js/);
+}));
+
 test('renders untrusted names as text and keeps the SVG self-contained', () => {
   const svg = renderSvg({
     name: '<script>alert(1)</script>', totalFiles: 1,
@@ -75,7 +84,7 @@ test('keeps linked code visible before a large test folder', () => {
   }));
   const svg = renderSvg({ name: 'many', totalFiles: 64, components,
     edges: [{ from: 'group1', to: 'group14', count: 50 }] });
-  assert.match(svg, /Group 1  →  Group 14/);
+  assert.match(svg, /group1  →  group14/);
   assert.doesNotMatch(svg, />Group 0<\/text>/);
 });
 
@@ -84,6 +93,26 @@ test('finds Python relative imports across groups', () => fixture({
   'src/data/store.py': 'value = 1\n',
 }, (root) => {
   assert.deepEqual(analyzeRepo(root).edges, [{ from: 'src/app', to: 'src/data', count: 1 }]);
+}));
+
+test('keeps nested Python imports inside a source group at file level', () => fixture({
+  'mindsage/vector-store/mcp_vector_store/__init__.py': '',
+  'mindsage/vector-store/mcp_vector_store/main.py': 'from . import helper\nfrom mcp_vector_store import storage\nfrom mcp_vector_store.storage import save\n',
+  'mindsage/vector-store/mcp_vector_store/helper.py': 'ready = True\n',
+  'mindsage/vector-store/mcp_vector_store/storage.py': 'def save(): pass\n',
+  'mindsage/vector-store/mcp_vector_store/large.py': 'x'.repeat(400_000),
+}, (root) => {
+  const graph = analyzeRepo(root);
+  const prefix = 'mindsage/vector-store/mcp_vector_store/';
+  assert.deepEqual(graph.imports, [
+    { from: `${prefix}main.py`, to: `${prefix}helper.py` },
+    { from: `${prefix}main.py`, to: `${prefix}storage.py` },
+  ]);
+  assert.deepEqual(graph.edges, []);
+  assert.deepEqual(graph.files.find((file) => file.path === `${prefix}main.py`), {
+    path: `${prefix}main.py`, group: 'mindsage/vector-store/mcp_vector_store', language: 'Python',
+  });
+  assert.equal(graph.skippedLargeFiles, 1);
 }));
 
 test('maps nested source roots and TypeScript files imported with .js names', () => fixture({
@@ -113,6 +142,8 @@ test('shows Python package folders and workspace package modules', () => fixture
     { from: 'packages/cli', to: 'packages/core', count: 1 },
     { from: 'packages/core', to: 'packages/core/analyzer', count: 1 },
   ]);
+  assert.ok(graph.imports.some(({ from, to }) =>
+    from === 'packages/cli/src/index.ts' && to === 'packages/core/src/index.ts'));
 }));
 
 test('ignores imports in common JavaScript comments and strings', () => fixture({

@@ -6,6 +6,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { analyzeRepo } from '../src/analyze.js';
 import { renderSvg } from '../src/render.js';
+import { renderReport } from '../src/report.js';
 
 const help = `Archcard — turn a repository into a README-ready architecture map
 
@@ -78,16 +79,23 @@ function main(args) {
       ? path.resolve(output)
       : path.resolve(cloneUrl ? '.' : root, 'docs/architecture.svg');
     fs.mkdirSync(path.dirname(destination), { recursive: true });
+    const report = destination.replace(/\.svg$/i, '') + '-map.md';
+    const sourceBase = cloneUrl
+      ? cloneUrl.slice(0, -4) + '/blob/' + spawnSync('git', ['-C', root, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).stdout.trim() + '/'
+      : (path.relative(path.dirname(report), path.resolve(root)).split(path.sep).join('/') || '.') + '/';
     fs.writeFileSync(destination, renderSvg(graph));
+    fs.writeFileSync(report, renderReport(graph, { sourceBase, image: path.basename(destination) }));
     const projectRelative = cloneUrl ? '..' : path.relative(path.resolve(root), destination);
     const shareRoot = projectRelative === '..' || projectRelative.startsWith(`..${path.sep}`)
       ? process.cwd() : path.resolve(root);
     const shown = path.isAbsolute(output ?? '')
       ? destination : path.relative(process.cwd(), destination).split(path.sep).join('/');
     const imagePath = path.relative(shareRoot, destination).split(path.sep).join('/');
-    process.stdout.write(`Wrote ${shown} from ${graph.totalFiles} source files.\n\n`);
+    const shownReport = path.relative(process.cwd(), report).split(path.sep).join('/');
+    process.stdout.write(`Wrote ${shown} and ${shownReport} from ${graph.totalFiles} source files.\n\n`);
     if (imagePath !== '..' && !imagePath.startsWith('../')) {
-      process.stdout.write(`Add this to your README:\n[![Architecture map](${encodeURI(imagePath)})](https://github.com/skipauthenticate/archcard)\n`);
+      const reportPath = path.relative(shareRoot, report).split(path.sep).join('/');
+      process.stdout.write(`Add this to your README:\n[![Architecture map](${encodeURI(imagePath)})](${encodeURI(reportPath)})\n[Made with Archcard](https://github.com/skipauthenticate/archcard)\n`);
     }
   } finally {
     if (temporary) fs.rmSync(temporary, { recursive: true, force: true });

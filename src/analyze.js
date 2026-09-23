@@ -17,7 +17,7 @@ const SKIP_DIRS = new Set([
   '.git', '.next', '.nuxt', '.venv', 'venv', '__pycache__', '.turbo',
 ]);
 const MAX_FILES = 6000;
-const MAX_FILE_BYTES = 256_000;
+const MAX_FILE_BYTES = 384_000;
 const compare = (left, right) => left < right ? -1 : left > right ? 1 : 0;
 
 function collect(root) {
@@ -95,54 +95,68 @@ function codeMask(source) {
   return code;
 }
 
-function importsFor(file, source, files, packageGroups) {
-  const found = new Set();
+function resolvePython(module, directory, files) {
+  const modulePath = module.replaceAll('.', '/');
+  for (let prefix = directory; prefix !== '.'; prefix = path.posix.dirname(prefix)) {
+    const target = resolveCandidate(path.posix.join(prefix, modulePath), files);
+    if (target) return target;
+  }
+  return resolveCandidate(modulePath, files) ?? resolveCandidate(`src/${modulePath}`, files);
+}
+
+function importsFor(file, source, files, packages) {
+  const foundFiles = new Set();
+  const foundGroups = new Set();
   const extension = path.posix.extname(file);
   const directory = path.posix.dirname(file);
-  const add = (specifier) => {
-    let target = null;
-    if (specifier.startsWith('.')) target = resolveCandidate(path.posix.join(directory, specifier), files);
-    else if (specifier.startsWith('@/')) {
+  const add = (target, group = target && groupFor(target)) => {
+    if (target && target !== file) foundFiles.add(target);
+    if (group) foundGroups.add(group);
+  };
+  const addJs = (specifier) => {
+    if (specifier.startsWith('.')) return add(resolveCandidate(path.posix.join(directory, specifier), files));
+    if (specifier.startsWith('@/')) {
       const parts = file.split('/');
-      const source = parts.indexOf('src');
-      target = resolveCandidate(`${source === -1 ? 'src' : parts.slice(0, source + 1).join('/')}/${specifier.slice(2)}`, files);
+      const sourceRoot = parts.indexOf('src');
+      const prefix = sourceRoot === -1 ? 'src' : parts.slice(0, sourceRoot + 1).join('/');
+      return add(resolveCandidate(`${prefix}/${specifier.slice(2)}`, files));
     }
-    else {
-      const packageName = specifier.startsWith('@') ? specifier.split('/').slice(0, 2).join('/') : specifier.split('/')[0];
-      if (packageGroups.has(packageName)) return found.add(packageGroups.get(packageName));
-    }
-    if (target) found.add(groupFor(target));
+    const packageName = specifier.startsWith('@') ? specifier.split('/').slice(0, 2).join('/') : specifier.split('/')[0];
+    const local = packages.get(packageName);
+    if (!local) return;
+    const suffix = specifier.slice(packageName.length).replace(/^\//, '');
+    const target = suffix
+      ? resolveCandidate(`${local.root}/src/${suffix}`, files) ?? resolveCandidate(`${local.root}/${suffix}`, files)
+      : resolveCandidate(`${local.root}/src/index`, files) ?? resolveCandidate(`${local.root}/index`, files);
+    add(target, local.group);
   };
 
   if (['.js', '.jsx', '.mjs', '.cjs', '.ts', '.tsx', '.mts', '.cts', '.vue', '.svelte'].includes(extension)) {
     const pattern = /\b(?:import|export)\s+(?:[^'"`]*?\s+from\s*)?['"]([^'"]+)['"]|\b(?:require|import)\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
     const code = codeMask(source);
     for (const match of source.matchAll(pattern)) {
-      if (code[match.index]) add(match[1] ?? match[2]);
+      if (code[match.index]) addJs(match[1] ?? match[2]);
     }
   } else if (extension === '.py') {
     for (const match of source.matchAll(/^\s*from\s+([\w.]+)\s+import\s+([\w*]+)/gm)) {
       const module = match[1];
       const dotCount = module.match(/^\.+/)?.[0].length ?? 0;
-      const base = dotCount ? path.posix.join(directory, ...Array(dotCount - 1).fill('..')) : '';
-      const target = path.posix.join(base, module.slice(dotCount).replaceAll('.', '/'));
-      const resolved = resolveCandidate(target, files)
-        ?? resolveCandidate(`${target}/${match[2]}`, files)
-        ?? (!dotCount ? resolveCandidate(`src/${target}`, files) : null);
-      if (resolved) found.add(groupFor(resolved));
+      if (dotCount) {
+        const base = path.posix.join(directory, ...Array(dotCount - 1).fill('..'));
+        const modulePath = path.posix.join(base, module.slice(dotCount).replaceAll('.', '/'));
+        const target = module.slice(dotCount)
+          ? resolveCandidate(`${modulePath}/${match[2]}`, files) ?? resolveCandidate(modulePath, files)
+          : resolveCandidate(`${base}/${match[2]}`, files) ?? resolveCandidate(base, files);
+        add(target);
+      } else {
+        add(resolvePython(`${module}.${match[2]}`, directory, files) ?? resolvePython(module, directory, files));
+      }
     }
-    for (const match of source.matchAll(/^\s*import\s+([\w.]+)/gm)) {
-      const target = match[1].replaceAll('.', '/');
-      const resolved = resolveCandidate(target, files) ?? resolveCandidate(`src/${target}`, files);
-      if (resolved) found.add(groupFor(resolved));
-    }
+    for (const match of source.matchAll(/^\s*import\s+([\w.]+)/gm)) add(resolvePython(match[1], directory, files));
   } else if (extension === '.rs') {
-    for (const match of source.matchAll(/\buse\s+crate::([\w:]+)/g)) {
-      const resolved = resolveCandidate(`src/${match[1].replaceAll('::', '/')}`, files);
-      if (resolved) found.add(groupFor(resolved));
-    }
+    for (const match of source.matchAll(/\buse\s+crate::([\w:]+)/g)) add(resolveCandidate(`src/${match[1].replaceAll('::', '/')}`, files));
   }
-  return found;
+  return { files: foundFiles, groups: foundGroups };
 }
 
 function labelFor(group) {
@@ -151,6 +165,9 @@ function labelFor(group) {
   const name = group.split('/').at(-1).replace(/[-_]/g, ' ');
   if (name.toLowerCase() === 'ui') return 'UI';
   if (name.toLowerCase() === 'api') return 'API';
+  if (name.toLowerCase() === 'cli') return 'CLI';
+  if (name.toLowerCase() === 'mcp') return 'MCP';
+  if (name.toLowerCase() === 'github') return 'GitHub';
   if (name.toLowerCase() === 'lib') return 'Library';
   if (name.toLowerCase() === 'test') return 'Tests';
   return name.replace(/\b\w/g, (letter) => letter.toUpperCase()).replace(/\b(Mcp|Llm|Ai)\b/g, (word) => word.toUpperCase());
@@ -171,7 +188,10 @@ function localPackages(root, groups) {
       const stat = fs.lstatSync(manifest);
       if (!stat.isFile() || stat.size > 65_536) continue;
       const name = JSON.parse(fs.readFileSync(manifest, 'utf8')).name;
-      if (typeof name === 'string') packages.set(name, groupSet.has(packageRoot) ? packageRoot : group);
+      if (typeof name === 'string') packages.set(name, {
+        root: packageRoot,
+        group: groupSet.has(packageRoot) ? packageRoot : group,
+      });
     } catch { /* A source folder does not need a package manifest. */ }
   }
   return packages;
@@ -196,12 +216,19 @@ export function analyzeRepo(input) {
   const fileSet = new Set(sourceFiles);
   const packageGroups = localPackages(root, groups.keys());
   const edges = new Map();
+  const imports = [];
+  let skippedLargeFiles = 0;
   for (const file of sourceFiles) {
     const absolute = path.join(root, file);
-    if (fs.statSync(absolute).size > MAX_FILE_BYTES) continue;
+    if (fs.statSync(absolute).size > MAX_FILE_BYTES) {
+      skippedLargeFiles++;
+      continue;
+    }
     const source = fs.readFileSync(absolute, 'utf8');
     const from = groupFor(file);
-    for (const to of importsFor(file, source, fileSet, packageGroups)) {
+    const found = importsFor(file, source, fileSet, packageGroups);
+    for (const to of found.files) imports.push({ from: file, to });
+    for (const to of found.groups) {
       if (from === to) continue;
       const key = `${from}\0${to}`;
       edges.set(key, (edges.get(key) ?? 0) + 1);
@@ -224,6 +251,13 @@ export function analyzeRepo(input) {
   return {
     name: path.basename(root),
     totalFiles: sourceFiles.length,
+    skippedLargeFiles,
+    files: sourceFiles.map((file) => ({
+      path: file,
+      group: groupFor(file),
+      language: SOURCE_EXTENSIONS.get(path.posix.extname(file).toLowerCase()),
+    })).sort((a, b) => compare(a.path, b.path)),
+    imports: imports.sort((a, b) => compare(a.from, b.from) || compare(a.to, b.to)),
     components,
     edges: relationships,
   };

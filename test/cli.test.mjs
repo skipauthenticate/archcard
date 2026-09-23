@@ -12,12 +12,21 @@ test('one command writes an embeddable card into the target repository', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'archcard-cli-'));
   try {
     fs.mkdirSync(path.join(root, 'src'));
-    fs.writeFileSync(path.join(root, 'src', 'index.js'), 'export const ready = true;\n');
+    fs.mkdirSync(path.join(root, 'docs'));
+    fs.writeFileSync(path.join(root, 'docs', 'ARCHITECTURE.md'), 'Project design notes.\n');
+    fs.writeFileSync(path.join(root, 'src', 'index.js'), "import { ready } from './helper.js';\nexport { ready };\n");
+    fs.writeFileSync(path.join(root, 'src', 'helper.js'), 'export const ready = true;\n');
     const output = execFileSync(process.execPath, [cli, root, '--title', 'MyApp'], { cwd: root, encoding: 'utf8' });
     assert.match(output, /\[!\[Architecture map\]\(docs\/architecture\.svg\)\]/);
     const svg = fs.readFileSync(path.join(root, 'docs', 'architecture.svg'), 'utf8');
     assert.match(svg, /<svg /);
     assert.match(svg, /<title id="title">MyApp repository map<\/title>/);
+    assert.match(output, /\]\(docs\/architecture-map\.md\)/);
+    const report = fs.readFileSync(path.join(root, 'docs', 'architecture-map.md'), 'utf8');
+    assert.match(report, /\[index\.js\]\(\.\.\/src\/index\.js\)/);
+    assert.match(report, /\[helper\.js\]\(\.\.\/src\/helper\.js\)/);
+    assert.match(svg, />1 local file imports</);
+    assert.equal(fs.readFileSync(path.join(root, 'docs', 'ARCHITECTURE.md'), 'utf8'), 'Project design notes.\n');
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }
