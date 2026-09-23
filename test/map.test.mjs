@@ -68,11 +68,35 @@ test('keeps total counts when small folders are grouped for display', () => {
   assert.match(svg, />More modules</);
 });
 
+test('keeps linked code visible before a large test folder', () => {
+  const components = Array.from({ length: 15 }, (_, index) => ({
+    id: `group${index}`, name: `Group ${index}`, path: index === 0 ? 'tests' : `group${index}`,
+    files: index === 0 ? 50 : 1, language: 'TypeScript',
+  }));
+  const svg = renderSvg({ name: 'many', totalFiles: 64, components,
+    edges: [{ from: 'group1', to: 'group14', count: 50 }] });
+  assert.match(svg, />Group 14<\/text>/);
+  assert.doesNotMatch(svg, />Group 0<\/text>/);
+});
+
 test('finds Python relative imports across groups', () => fixture({
   'src/app/main.py': 'from ..data import store\n',
   'src/data/store.py': 'value = 1\n',
 }, (root) => {
   assert.deepEqual(analyzeRepo(root).edges, [{ from: 'src/app', to: 'src/data', count: 1 }]);
+}));
+
+test('maps nested source roots and TypeScript files imported with .js names', () => fixture({
+  'web/src/components/chat/Panel.tsx': "import { fetchData } from '@/lib/client';\n",
+  'web/src/lib/client.ts': 'export const fetchData = () => 1;\n',
+  'backend/server/connectors/load.ts': "import { store } from '../store.js';\n",
+  'backend/server/store.ts': 'export const store = () => 1;\n',
+}, (root) => {
+  const graph = analyzeRepo(root);
+  assert.deepEqual(graph.edges, [
+    { from: 'backend/server/connectors', to: 'backend/server', count: 1 },
+    { from: 'web/src/components/chat', to: 'web/src/lib', count: 1 },
+  ]);
 }));
 
 test('ignores imports in common JavaScript comments and strings', () => fixture({

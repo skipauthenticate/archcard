@@ -10,7 +10,7 @@ import { renderSvg } from '../src/render.js';
 const help = `Archcard — turn a repository into a README-ready architecture map
 
 Usage:
-  archcard [path-or-github-url] [--out docs/architecture.svg]
+  archcard [path-or-github-url] [--out docs/architecture.svg] [--title "Project Name"]
 
 Examples:
   archcard .
@@ -40,12 +40,16 @@ function main(args) {
 
   let input = '.';
   let output;
+  let title;
   let hasInput = false;
   for (let index = 0; index < args.length; index++) {
     const argument = args[index];
     if (argument === '--out') {
       output = args[++index];
       if (!output || output.startsWith('--')) throw new Error('--out needs a file path.');
+    } else if (argument === '--title') {
+      title = args[++index];
+      if (!title || title.startsWith('--')) throw new Error('--title needs a project name.');
     } else if (argument.startsWith('-')) {
       throw new Error(`Unknown option: ${argument}`);
     } else if (hasInput) {
@@ -69,6 +73,7 @@ function main(args) {
     }
     const graph = analyzeRepo(root);
     if (cloneUrl) graph.name = path.posix.basename(new URL(cloneUrl).pathname, '.git');
+    if (title) graph.name = title;
     const destination = output
       ? path.resolve(output)
       : path.resolve(cloneUrl ? '.' : root, 'docs/architecture.svg');

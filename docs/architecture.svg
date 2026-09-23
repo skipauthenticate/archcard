@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1200 1054" width="1200" height="1054" role="img" aria-labelledby="title description">
-  <title id="title">storyworld architecture map</title>
-  <desc id="description">10 component groups and 20 import links found in 86 source files.</desc>
+  <title id="title">LMStash architecture map</title>
+  <desc id="description">26 component groups and 45 import links found in 253 source files.</desc>
   <defs>
     <pattern id="dots" width="28" height="28" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#7C877C" opacity=".17"/></pattern>
     <marker id="arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7" fill="none" stroke="#68766C" stroke-width="1"/></marker>
@@ -8,117 +8,137 @@
   <rect width="1200" height="1054" rx="18" fill="#F2F1EB"/>
   <rect width="1200" height="1054" rx="18" fill="url(#dots)"/>
   <text x="54" y="57" fill="#8F4B34" font-size="11" font-weight="700" letter-spacing="3">REPOSITORY / ARCHITECTURE</text>
-  <text x="54" y="127" fill="#202922" font-size="57" font-weight="700">Storyworld</text>
+  <text x="54" y="127" fill="#202922" font-size="57" font-weight="700">LMStash</text>
   <text x="54" y="161" fill="#5E6860" font-size="15">A map of the source, drawn from local imports.</text>
   <line x1="54" y1="197" x2="1146" y2="197" stroke="#C7CCC2"/>
-  <text x="54" y="225" fill="#38473C" font-size="12" font-weight="600">10 GROUPS</text>
-  <text x="235" y="225" fill="#38473C" font-size="12" font-weight="600">20 IMPORT LINKS</text>
-  <text x="414" y="225" fill="#38473C" font-size="12" font-weight="600">86 SOURCE FILES</text>
-  <g><path d="M 206 396 C 206 410.5, 206 410.5, 206 425" fill="none" stroke="#68766C" stroke-width="3" stroke-opacity=".60" marker-end="url(#arrow)"/>
-<path d="M 966 396 C 966 410.5, 220 410.5, 220 425" fill="none" stroke="#68766C" stroke-width="2.342206476617281" stroke-opacity=".60" marker-end="url(#arrow)"/>
-<path d="M 980 396 C 980 496, 980 496, 980 596" fill="none" stroke="#68766C" stroke-width="2.275488750216347" stroke-opacity=".60" marker-end="url(#arrow)"/>
-<path d="M 800 325 C 600 283, 600 283, 400 325" fill="none" stroke="#68766C" stroke-width="2.196578428466209" stroke-opacity=".60" marker-end="url(#arrow)"/></g>
+  <text x="54" y="225" fill="#38473C" font-size="12" font-weight="600">26 GROUPS</text>
+  <text x="235" y="225" fill="#38473C" font-size="12" font-weight="600">45 IMPORT LINKS</text>
+  <text x="414" y="225" fill="#38473C" font-size="12" font-weight="600">253 SOURCE FILES</text>
+  <g><path d="M 579 396 C 579 581.5, 206 581.5, 206 767" fill="none" stroke="#68766C" stroke-width="3" stroke-opacity=".60" marker-end="url(#arrow)"/>
+<path d="M 966 396 C 966 581.5, 966 581.5, 966 767" fill="none" stroke="#68766C" stroke-width="2.575488750216347" stroke-opacity=".60" marker-end="url(#arrow)"/>
+<path d="M 980 767 C 980 581.5, 607 581.5, 607 396" fill="none" stroke="#68766C" stroke-width="2.4965784284662087" stroke-opacity=".60" marker-end="url(#arrow)"/>
+<path d="M 994 567 C 994 667, 248 667, 248 767" fill="none" stroke="#68766C" stroke-width="2.4" stroke-opacity=".60" marker-end="url(#arrow)"/></g>
   <g transform="translate(54 254)">
       <rect width="346" height="142" rx="13" fill="#FFFEFA" stroke="#8F4B34" stroke-width="1"/>
       <rect x="0" y="22" width="3" height="45" rx="1.5" fill="#8F4B34"/>
-      <text x="22" y="37" fill="#8F4B34" font-size="11" font-weight="700" letter-spacing="1.6">01 / INTERFACE · LARGEST GROUP</text>
-      <text x="22" y="77" fill="#202922" font-size="25" font-weight="650">UI</text>
-      <text x="22" y="103" fill="#59645B" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">src/components/ui</text>
+      <text x="22" y="37" fill="#8F4B34" font-size="11" font-weight="700" letter-spacing="1.6">01 / MODULE · LARGEST GROUP</text>
+      <text x="22" y="77" fill="#202922" font-size="25" font-weight="650">MCP Vector Store</text>
+      <text x="22" y="103" fill="#59645B" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">mindsage/vector-store/mcp_vector_store</text>
       <line x1="22" y1="115" x2="324" y2="115" stroke="#D9DCD3"/>
-      <text x="22" y="133" fill="#5E6860" font-size="11">49 source files</text>
-      <text x="324" y="133" fill="#5E6860" font-size="11" text-anchor="end">TypeScript</text>
+      <text x="22" y="133" fill="#5E6860" font-size="11">53 source files</text>
+      <text x="324" y="133" fill="#5E6860" font-size="11" text-anchor="end">Python</text>
     </g>
 <g transform="translate(427 254)">
       <rect width="346" height="142" rx="13" fill="#FFFEFA" stroke="#C8C9C0" stroke-width="1"/>
       <rect x="0" y="22" width="3" height="45" rx="1.5" fill="#8F4B34"/>
-      <text x="22" y="37" fill="#8F4B34" font-size="11" font-weight="700" letter-spacing="1.6">02 / MODULE</text>
-      <text x="22" y="77" fill="#202922" font-size="25" font-weight="650">Hooks</text>
-      <text x="22" y="103" fill="#59645B" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">src/hooks</text>
+      <text x="22" y="37" fill="#8F4B34" font-size="11" font-weight="700" letter-spacing="1.6">02 / INTERFACE</text>
+      <text x="22" y="77" fill="#202922" font-size="25" font-weight="650">UI</text>
+      <text x="22" y="103" fill="#59645B" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">mindsage-frontend/src/components/ui</text>
       <line x1="22" y1="115" x2="324" y2="115" stroke="#D9DCD3"/>
-      <text x="22" y="133" fill="#5E6860" font-size="11">9 source files</text>
+      <text x="22" y="133" fill="#5E6860" font-size="11">49 source files</text>
       <text x="324" y="133" fill="#5E6860" font-size="11" text-anchor="end">TypeScript</text>
     </g>
 <g transform="translate(800 254)">
       <rect width="346" height="142" rx="13" fill="#FFFEFA" stroke="#C8C9C0" stroke-width="1"/>
       <rect x="0" y="22" width="3" height="45" rx="1.5" fill="#8F4B34"/>
       <text x="22" y="37" fill="#8F4B34" font-size="11" font-weight="700" letter-spacing="1.6">03 / INTERFACE</text>
-      <text x="22" y="77" fill="#202922" font-size="25" font-weight="650">Storyworld</text>
-      <text x="22" y="103" fill="#59645B" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">src/components/storyworld</text>
+      <text x="22" y="77" fill="#202922" font-size="25" font-weight="650">Graph</text>
+      <text x="22" y="103" fill="#59645B" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">mindsage-frontend/src/components/graph</text>
       <line x1="22" y1="115" x2="324" y2="115" stroke="#D9DCD3"/>
-      <text x="22" y="133" fill="#5E6860" font-size="11">8 source files</text>
+      <text x="22" y="133" fill="#5E6860" font-size="11">13 source files</text>
       <text x="324" y="133" fill="#5E6860" font-size="11" text-anchor="end">TypeScript</text>
     </g>
 <g transform="translate(54 425)">
       <rect width="346" height="142" rx="13" fill="#FFFEFA" stroke="#C8C9C0" stroke-width="1"/>
       <rect x="0" y="22" width="3" height="45" rx="1.5" fill="#8F4B34"/>
-      <text x="22" y="37" fill="#8F4B34" font-size="11" font-weight="700" letter-spacing="1.6">04 / SHARED</text>
-      <text x="22" y="77" fill="#202922" font-size="25" font-weight="650">Library</text>
-      <text x="22" y="103" fill="#59645B" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">src/lib</text>
+      <text x="22" y="37" fill="#8F4B34" font-size="11" font-weight="700" letter-spacing="1.6">04 / INTERFACE</text>
+      <text x="22" y="77" fill="#202922" font-size="25" font-weight="650">Consent</text>
+      <text x="22" y="103" fill="#59645B" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">mindsage-frontend/src/components/consent</text>
       <line x1="22" y1="115" x2="324" y2="115" stroke="#D9DCD3"/>
-      <text x="22" y="133" fill="#5E6860" font-size="11">6 source files</text>
+      <text x="22" y="133" fill="#5E6860" font-size="11">12 source files</text>
       <text x="324" y="133" fill="#5E6860" font-size="11" text-anchor="end">TypeScript</text>
     </g>
 <g transform="translate(427 425)">
       <rect width="346" height="142" rx="13" fill="#FFFEFA" stroke="#C8C9C0" stroke-width="1"/>
       <rect x="0" y="22" width="3" height="45" rx="1.5" fill="#8F4B34"/>
-      <text x="22" y="37" fill="#8F4B34" font-size="11" font-weight="700" letter-spacing="1.6">05 / TESTS</text>
-      <text x="22" y="77" fill="#202922" font-size="25" font-weight="650">Tests</text>
-      <text x="22" y="103" fill="#59645B" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">src/test</text>
+      <text x="22" y="37" fill="#8F4B34" font-size="11" font-weight="700" letter-spacing="1.6">05 / SERVICE</text>
+      <text x="22" y="77" fill="#202922" font-size="25" font-weight="650">Browser Connector</text>
+      <text x="22" y="103" fill="#59645B" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">mindsage/server/browser-connector</text>
       <line x1="22" y1="115" x2="324" y2="115" stroke="#D9DCD3"/>
-      <text x="22" y="133" fill="#5E6860" font-size="11">3 source files</text>
-      <text x="324" y="133" fill="#5E6860" font-size="11" text-anchor="end">TypeScript</text>
+      <text x="22" y="133" fill="#5E6860" font-size="11">12 source files</text>
+      <text x="324" y="133" fill="#5E6860" font-size="11" text-anchor="end">JavaScript</text>
     </g>
 <g transform="translate(800 425)">
       <rect width="346" height="142" rx="13" fill="#FFFEFA" stroke="#C8C9C0" stroke-width="1"/>
       <rect x="0" y="22" width="3" height="45" rx="1.5" fill="#8F4B34"/>
       <text x="22" y="37" fill="#8F4B34" font-size="11" font-weight="700" letter-spacing="1.6">06 / INTERFACE</text>
-      <text x="22" y="77" fill="#202922" font-size="25" font-weight="650">Components</text>
-      <text x="22" y="103" fill="#59645B" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">src/components</text>
+      <text x="22" y="77" fill="#202922" font-size="25" font-weight="650">Home</text>
+      <text x="22" y="103" fill="#59645B" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">mindsage-frontend/src/components/home</text>
       <line x1="22" y1="115" x2="324" y2="115" stroke="#D9DCD3"/>
-      <text x="22" y="133" fill="#5E6860" font-size="11">2 source files</text>
+      <text x="22" y="133" fill="#5E6860" font-size="11">9 source files</text>
       <text x="324" y="133" fill="#5E6860" font-size="11" text-anchor="end">TypeScript</text>
     </g>
 <g transform="translate(54 596)">
       <rect width="346" height="142" rx="13" fill="#FFFEFA" stroke="#C8C9C0" stroke-width="1"/>
       <rect x="0" y="22" width="3" height="45" rx="1.5" fill="#8F4B34"/>
-      <text x="22" y="37" fill="#8F4B34" font-size="11" font-weight="700" letter-spacing="1.6">07 / INTERFACE</text>
-      <text x="22" y="77" fill="#202922" font-size="25" font-weight="650">Pages</text>
-      <text x="22" y="103" fill="#59645B" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">src/pages</text>
+      <text x="22" y="37" fill="#8F4B34" font-size="11" font-weight="700" letter-spacing="1.6">07 / SERVICE</text>
+      <text x="22" y="77" fill="#202922" font-size="25" font-weight="650">Connectors</text>
+      <text x="22" y="103" fill="#59645B" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">mindsage/server/connectors</text>
       <line x1="22" y1="115" x2="324" y2="115" stroke="#D9DCD3"/>
-      <text x="22" y="133" fill="#5E6860" font-size="11">2 source files</text>
+      <text x="22" y="133" fill="#5E6860" font-size="11">7 source files</text>
       <text x="324" y="133" fill="#5E6860" font-size="11" text-anchor="end">TypeScript</text>
     </g>
 <g transform="translate(427 596)">
       <rect width="346" height="142" rx="13" fill="#FFFEFA" stroke="#C8C9C0" stroke-width="1"/>
       <rect x="0" y="22" width="3" height="45" rx="1.5" fill="#8F4B34"/>
-      <text x="22" y="37" fill="#8F4B34" font-size="11" font-weight="700" letter-spacing="1.6">08 / MODULE</text>
-      <text x="22" y="77" fill="#202922" font-size="25" font-weight="650">Supabase</text>
-      <text x="22" y="103" fill="#59645B" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">supabase</text>
+      <text x="22" y="37" fill="#8F4B34" font-size="11" font-weight="700" letter-spacing="1.6">08 / INTERFACE</text>
+      <text x="22" y="77" fill="#202922" font-size="25" font-weight="650">Components</text>
+      <text x="22" y="103" fill="#59645B" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">mindsage-frontend/src/components</text>
       <line x1="22" y1="115" x2="324" y2="115" stroke="#D9DCD3"/>
-      <text x="22" y="133" fill="#5E6860" font-size="11">2 source files</text>
+      <text x="22" y="133" fill="#5E6860" font-size="11">6 source files</text>
       <text x="324" y="133" fill="#5E6860" font-size="11" text-anchor="end">TypeScript</text>
     </g>
 <g transform="translate(800 596)">
       <rect width="346" height="142" rx="13" fill="#FFFEFA" stroke="#C8C9C0" stroke-width="1"/>
       <rect x="0" y="22" width="3" height="45" rx="1.5" fill="#8F4B34"/>
-      <text x="22" y="37" fill="#8F4B34" font-size="11" font-weight="700" letter-spacing="1.6">09 / DATA</text>
-      <text x="22" y="77" fill="#202922" font-size="25" font-weight="650">Data</text>
-      <text x="22" y="103" fill="#59645B" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">src/data</text>
+      <text x="22" y="37" fill="#8F4B34" font-size="11" font-weight="700" letter-spacing="1.6">09 / MODULE</text>
+      <text x="22" y="77" fill="#202922" font-size="25" font-weight="650">Hooks</text>
+      <text x="22" y="103" fill="#59645B" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">mindsage-frontend/src/hooks</text>
       <line x1="22" y1="115" x2="324" y2="115" stroke="#D9DCD3"/>
-      <text x="22" y="133" fill="#5E6860" font-size="11">1 source file</text>
+      <text x="22" y="133" fill="#5E6860" font-size="11">6 source files</text>
+      <text x="324" y="133" fill="#5E6860" font-size="11" text-anchor="end">TypeScript</text>
+    </g>
+<g transform="translate(54 767)">
+      <rect width="346" height="142" rx="13" fill="#FFFEFA" stroke="#C8C9C0" stroke-width="1"/>
+      <rect x="0" y="22" width="3" height="45" rx="1.5" fill="#8F4B34"/>
+      <text x="22" y="37" fill="#8F4B34" font-size="11" font-weight="700" letter-spacing="1.6">10 / SHARED</text>
+      <text x="22" y="77" fill="#202922" font-size="25" font-weight="650">Library</text>
+      <text x="22" y="103" fill="#59645B" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">mindsage-frontend/src/lib</text>
+      <line x1="22" y1="115" x2="324" y2="115" stroke="#D9DCD3"/>
+      <text x="22" y="133" fill="#5E6860" font-size="11">4 source files</text>
       <text x="324" y="133" fill="#5E6860" font-size="11" text-anchor="end">TypeScript</text>
     </g>
 <g transform="translate(427 767)">
       <rect width="346" height="142" rx="13" fill="#FFFEFA" stroke="#C8C9C0" stroke-width="1"/>
       <rect x="0" y="22" width="3" height="45" rx="1.5" fill="#8F4B34"/>
-      <text x="22" y="37" fill="#8F4B34" font-size="11" font-weight="700" letter-spacing="1.6">10 / MODULE</text>
-      <text x="22" y="77" fill="#202922" font-size="25" font-weight="650">Source root</text>
-      <text x="22" y="103" fill="#59645B" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">src</text>
+      <text x="22" y="37" fill="#8F4B34" font-size="11" font-weight="700" letter-spacing="1.6">11 / SERVICE</text>
+      <text x="22" y="77" fill="#202922" font-size="25" font-weight="650">Server</text>
+      <text x="22" y="103" fill="#59645B" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">mindsage/server</text>
       <line x1="22" y1="115" x2="324" y2="115" stroke="#D9DCD3"/>
       <text x="22" y="133" fill="#5E6860" font-size="11">4 source files</text>
-      <text x="324" y="133" fill="#5E6860" font-size="11" text-anchor="end">CSS</text>
+      <text x="324" y="133" fill="#5E6860" font-size="11" text-anchor="end">TypeScript</text>
+    </g>
+<g transform="translate(800 767)">
+      <rect width="346" height="142" rx="13" fill="#FFFEFA" stroke="#C8C9C0" stroke-width="1"/>
+      <rect x="0" y="22" width="3" height="45" rx="1.5" fill="#8F4B34"/>
+      <text x="22" y="37" fill="#8F4B34" font-size="11" font-weight="700" letter-spacing="1.6">12 / MODULE</text>
+      <text x="22" y="77" fill="#202922" font-size="25" font-weight="650">More modules</text>
+      <text x="22" y="103" fill="#59645B" font-size="12" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">15 groups</text>
+      <line x1="22" y1="115" x2="324" y2="115" stroke="#D9DCD3"/>
+      <text x="22" y="133" fill="#5E6860" font-size="11">78 source files</text>
+      <text x="324" y="133" fill="#5E6860" font-size="11" text-anchor="end">Mixed</text>
     </g>
   <line x1="54" y1="985" x2="1146" y2="985" stroke="#C7CCC2"/>
-  <text x="54" y="1014" fill="#657067" font-size="12">4 of 20 local links shown · Groups follow source folders</text>
+  <text x="54" y="1014" fill="#657067" font-size="12">4 of 45 local links shown · Groups follow source folders</text>
   <a href="https://github.com/skipauthenticate/archcard" target="_blank"><text x="1146" y="1014" text-anchor="end" fill="#58645C" font-size="13">Made with Archcard ↗</text></a>
 </svg>

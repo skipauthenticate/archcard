@@ -32,8 +32,14 @@ function roleFor(component) {
 
 function visibleGraph(graph) {
   if (graph.components.length <= MAX_CARDS) return graph;
-  const keep = graph.components.slice(0, MAX_CARDS - 1);
-  const rest = graph.components.slice(MAX_CARDS - 1);
+  const incoming = new Map();
+  for (const edge of graph.edges) incoming.set(edge.to, (incoming.get(edge.to) ?? 0) + edge.count);
+  const score = (component) => component.files + 2 * Math.sqrt(incoming.get(component.id) ?? 0) + (roleFor(component) === 'SERVICE' ? 2 : 0);
+  const ranked = [...graph.components].sort((a, b) =>
+    Number(roleFor(a) === 'TESTS') - Number(roleFor(b) === 'TESTS') || score(b) - score(a) || compare(a.id, b.id));
+  const selected = new Set(ranked.slice(0, MAX_CARDS - 1).map((component) => component.id));
+  const keep = graph.components.filter((component) => selected.has(component.id));
+  const rest = graph.components.filter((component) => !selected.has(component.id));
   const kept = new Set(keep.map((component) => component.id));
   let otherId = '__archcard_other__';
   while (graph.components.some((component) => component.id === otherId)) otherId += '_';

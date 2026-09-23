@@ -13,9 +13,11 @@ test('one command writes an embeddable card into the target repository', () => {
   try {
     fs.mkdirSync(path.join(root, 'src'));
     fs.writeFileSync(path.join(root, 'src', 'index.js'), 'export const ready = true;\n');
-    const output = execFileSync(process.execPath, [cli, root], { cwd: root, encoding: 'utf8' });
+    const output = execFileSync(process.execPath, [cli, root, '--title', 'MyApp'], { cwd: root, encoding: 'utf8' });
     assert.match(output, /\[!\[Architecture map\]\(docs\/architecture\.svg\)\]/);
-    assert.match(fs.readFileSync(path.join(root, 'docs', 'architecture.svg'), 'utf8'), /<svg /);
+    const svg = fs.readFileSync(path.join(root, 'docs', 'architecture.svg'), 'utf8');
+    assert.match(svg, /<svg /);
+    assert.match(svg, /<title id="title">MyApp architecture map<\/title>/);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }

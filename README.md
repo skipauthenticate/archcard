@@ -4,9 +4,9 @@
 
 Archcard reads a repository and draws its main folders and imports as an SVG image. Add the image to a README so a new reader can see how the code is organized. The tool runs locally. It sends no source files to a model or hosted service.
 
-![Archcard map of Storyworld, with source folders and import links](docs/architecture.svg)
+![Archcard map of LMStash, with source folders and import links](docs/architecture.svg)
 
-This map is from [Storyworld](https://github.com/skipauthenticate/storyworld).
+This map is from [LMStash](https://github.com/skipauthenticate/lmstash).
 
 ## Try it
 
@@ -23,6 +23,8 @@ npx --yes github:skipauthenticate/archcard https://github.com/skipauthenticate/d
 ```
 
 Open `docky.svg` to see the result. Commit the SVG and add the printed image link to your README. Archcard does not edit your README or make a commit.
+
+Use `--title LMStash` when you want to keep the exact capitalization of a project name.
 
 ## What the map shows
 

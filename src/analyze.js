@@ -45,8 +45,14 @@ function groupFor(file) {
   const parts = file.split('/');
   if (parts.length === 1) return 'root';
   if (['apps', 'packages', 'services'].includes(parts[0]) && parts.length > 2) return `${parts[0]}/${parts[1]}`;
-  if (parts[0] === 'src' && ['components', 'features', 'modules'].includes(parts[1]) && parts.length > 3) return `src/${parts[1]}/${parts[2]}`;
-  if (parts[0] === 'src' && parts.length > 2) return `src/${parts[1]}`;
+  const source = parts.findIndex((part, index) => index < 3 && part === 'src');
+  if (source !== -1) {
+    if (['components', 'features', 'modules'].includes(parts[source + 1]) && parts.length > source + 3) return parts.slice(0, source + 3).join('/');
+    if (parts.length > source + 2) return parts.slice(0, source + 2).join('/');
+    return parts.slice(0, source + 1).join('/');
+  }
+  const codeRoot = parts.slice(0, 2).findLastIndex((part) => ['server', 'backend', 'api', 'client', 'frontend', 'vector-store'].includes(part));
+  if (codeRoot !== -1) return parts.slice(0, Math.min(parts.length - 1, codeRoot + 2)).join('/');
   return parts[0];
 }
 
@@ -54,6 +60,11 @@ function resolveCandidate(base, files) {
   const normalized = path.posix.normalize(base);
   if (normalized === '..' || normalized.startsWith('../') || normalized.startsWith('/')) return null;
   const options = [normalized];
+  const extension = path.posix.extname(normalized);
+  if (['.js', '.jsx', '.mjs', '.cjs'].includes(extension)) {
+    const base = normalized.slice(0, -extension.length);
+    for (const sourceExtension of ['.ts', '.tsx', '.mts', '.cts']) options.push(base + sourceExtension);
+  }
   for (const extension of SOURCE_EXTENSIONS.keys()) {
     options.push(normalized + extension, `${normalized}/index${extension}`, `${normalized}/__init__${extension}`);
   }
@@ -88,7 +99,11 @@ function importsFor(file, source, files, packageGroups) {
   const add = (specifier) => {
     let target = null;
     if (specifier.startsWith('.')) target = resolveCandidate(path.posix.join(directory, specifier), files);
-    else if (specifier.startsWith('@/')) target = resolveCandidate(`src/${specifier.slice(2)}`, files);
+    else if (specifier.startsWith('@/')) {
+      const parts = file.split('/');
+      const source = parts.indexOf('src');
+      target = resolveCandidate(`${source === -1 ? 'src' : parts.slice(0, source + 1).join('/')}/${specifier.slice(2)}`, files);
+    }
     else {
       const packageName = specifier.startsWith('@') ? specifier.split('/').slice(0, 2).join('/') : specifier.split('/')[0];
       if (packageGroups.has(packageName)) return found.add(packageGroups.get(packageName));
@@ -135,7 +150,7 @@ function labelFor(group) {
   if (name.toLowerCase() === 'api') return 'API';
   if (name.toLowerCase() === 'lib') return 'Library';
   if (name.toLowerCase() === 'test') return 'Tests';
-  return name.replace(/\b\w/g, (letter) => letter.toUpperCase());
+  return name.replace(/\b\w/g, (letter) => letter.toUpperCase()).replace(/\b(Mcp|Llm|Ai)\b/g, (word) => word.toUpperCase());
 }
 
 function localPackages(root, groups) {
